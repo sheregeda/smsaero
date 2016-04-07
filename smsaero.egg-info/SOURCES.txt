@@ -1,0 +1,8 @@
+setup.py
+smsaero/__init__.py
+smsaero/api.py
+smsaero.egg-info/PKG-INFO
+smsaero.egg-info/SOURCES.txt
+smsaero.egg-info/dependency_links.txt
+smsaero.egg-info/not-zip-safe
+smsaero.egg-info/top_level.txt
