@@ -1,6 +1,6 @@
-#coding: utf-8
+# coding: utf-8
 import unittest
-#from smsaero import *
+from smsaero import *
 
 
 class TestApi(unittest.TestCase):

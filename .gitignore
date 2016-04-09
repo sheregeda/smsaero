@@ -1,2 +1,4 @@
 *.pyc
 smsaero.egg-info
+.cache/
+.coverage
