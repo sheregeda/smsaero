@@ -6,6 +6,6 @@ install:
     - pip install pytest-cov --use-mirrors
     - pip install pytest-pep8 --use-mirrors
     - pip install coveralls --use-mirrors
-script: py.test ./tests/test_api.py --pep8 dateconv -v --cov dateconv --cov-report term-missing
+script: py.test ./tests/test_api.py
 after_success:
     - coveralls
