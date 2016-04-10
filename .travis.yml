@@ -1,7 +1,6 @@
 language: python
 python:
     - "2.7"
-    - "3.4"
 install:
     - pip install pytest-cov --use-mirrors
     - pip install pytest-pep8 --use-mirrors
