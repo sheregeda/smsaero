@@ -1,11 +1,11 @@
 # coding: utf-8
 import unittest
-from smsaero import *
+from smsaero.api import SmsAero
 
 
 class TestApi(unittest.TestCase):
 
-    def test_some_request(self):
+    def test_send(self):
         pass
 
 

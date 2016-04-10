@@ -1,15 +1,20 @@
 # coding: UTF-8
-import urlparse
 import json
+import time
 import requests
 import hashlib
+from urlparse import urljoin
+from datetime import datetime
 
 
 class SmsAero(object):
-    def __init__(self, url_gate, user, passwd, sign):
-        self.url_gate = url_gate
+    URL_GATE = 'https://gate.smsaero.ru/'
+    SIGNATURE = 'NEWS'
+
+    def __init__(self, user, passwd, url_gate=None, sign=None):
         self.user = user
-        self.sign = sign
+        self.url_gate = url_gate if url_gate else URL_GATE
+        self.sign = sign if sign else SIGNATURE
         self.session = requests.session()
 
         m = hashlib.md5()
@@ -18,21 +23,28 @@ class SmsAero(object):
 
     def __request(self, selector, data):
         data.update({
-            'answer': 'json',
             'user': self.user,
             'password': self.passwd,
             'from': self.sign,
         })
-        url = urlparse.urljoin(self.url_gate, selector)
-        return self.session.post(url, data=data, verify=False).json()
+        url = urljoin(self.url_gate, selector)
+        return self.session.post(url, data=data).json()
 
-    def send(self, to, text, digital=0, type_send=2):
+    def send(self, to, text, date=None, digital=0, type_send=2, answer='json'):
         data = {
             'digital': digital,
             'type_send': type_send,
             'to': to,
             'text': text,
+            'answer': answer,
         }
+
+        if date is not None:
+            if isinstance(date, datetime):
+                data.update({'date': int(time.mktime(date.timetuple()))})
+            else:
+                raise Exception('param `date` is not datetime object')
+
         return self.__request('/send/', data)
 
     def send_to_group(self):
