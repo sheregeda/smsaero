@@ -1,6 +1,6 @@
 # smsaero
 
-[![Build Status](https://travis-ci.org/sheregeda/smsaero.svg?branch=master)](https://travis-ci.org/sheregeda/smsaero) [![Coverage Status](https://coveralls.io/repos/github/sheregeda/smsaero/badge.svg?branch=master)](https://coveralls.io/github/sheregeda/smsaero?branch=master) [![Documentation Status](https://readthedocs.org/projects/smsaero/badge/?version=latest)](http://smsaero.readthedocs.org/en/latest/?badge=latest)
+[![PyPI version](https://img.shields.io/pypi/v/smsaero.svg)](https://pypi.python.org/pypi/smsaero) [![Build Status](https://travis-ci.org/sheregeda/smsaero.svg?branch=master)](https://travis-ci.org/sheregeda/smsaero) [![Coverage Status](https://coveralls.io/repos/github/sheregeda/smsaero/badge.svg?branch=master)](https://coveralls.io/github/sheregeda/smsaero?branch=master) [![Documentation Status](https://readthedocs.org/projects/smsaero/badge/?version=latest)](http://smsaero.readthedocs.org/en/latest/?badge=latest)
 
 SMSAero API HTTP client based on [requests](http://docs.python-requests.org/en/master/) library.
 
