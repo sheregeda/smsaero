@@ -18,10 +18,10 @@ class SmsAero(object):
     URL_GATE = 'http://gate.smsaero.ru/'
     SIGNATURE = 'NEWS'
 
-    def __init__(self, user, passwd, url_gate=URL_GATE, sign=SIGNATURE):
+    def __init__(self, user, passwd, url_gate=URL_GATE, signature=SIGNATURE):
         self.user = user
         self.url_gate = url_gate
-        self.sign = sign
+        self.signature = signature
         self.session = requests.session()
 
         m = hashlib.md5()
@@ -32,7 +32,7 @@ class SmsAero(object):
         data.update({
             'user': self.user,
             'password': self.passwd,
-            'from': self.sign,
+            'answer': 'json',
         })
         url = urljoin(self.url_gate, selector)
 
@@ -49,9 +49,9 @@ class SmsAero(object):
     def _check_response(self, content):
         try:
             response = json.loads(content)
-            if response['result'] == u'reject':
+            if 'result' in response and response['result'] == u'reject':
                 raise SmsAeroError(response['reason'])
-            elif response['result'] == u'no credits':
+            elif 'result' in response and response['result'] == u'no credits':
                 raise SmsAeroError(response['result'])
             return response
         except ValueError:
@@ -61,13 +61,13 @@ class SmsAero(object):
             else:
                 raise SmsAeroError('unexpected format is received')
 
-    def send(self, to, text, date=None, digital=0, type_send=2, answer='json'):
+    def send(self, to, text, date=None, digital=0, type_send=2):
         data = {
+            'from': self.signature,
             'digital': digital,
             'type_send': type_send,
             'to': to,
             'text': text,
-            'answer': answer,
         }
 
         if date is not None:
@@ -77,3 +77,18 @@ class SmsAero(object):
                 raise SmsAeroError('param `date` is not datetime object')
 
         return self._request('/send/', data)
+
+    def status(self, id):
+        return self._request('/status/', {'id': id})
+
+    def balance(self):
+        return self._request('/balance/', {})
+
+    def checktarif(self):
+        return self._request('/checktarif/', {})
+
+    def senders(self):
+        return self._request('/senders/', {})
+
+    def sign(self, sign):
+        return self._request('/sign/', {'sign': sign})

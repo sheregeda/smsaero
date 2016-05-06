@@ -118,6 +118,75 @@ class TestApi(unittest.TestCase):
         except SmsAeroError:
             pass
 
+    @httpretty.activate
+    def test_status(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/status/'),
+            body='{"reason": "empty field", "result": "reject"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        try:
+            self.api.status(0)
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
+    @httpretty.activate
+    def test_balance(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/balance/'),
+            body='{"balance": "48.20"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.balance()
+        self.assertEqual(response['balance'], u'48.20')
+
+    @httpretty.activate
+    def test_checktarif(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/checktarif/'),
+            body='{"reason": {"Digital channel": "0.45", \
+                "Direct channel": "1.80"}, "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.checktarif()
+        self.assertEqual(response['reason']['Digital channel'], u'0.45')
+
+    @httpretty.activate
+    def test_sign(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/sign/'),
+            body='{"accepted": "pending"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.sign('awesome')
+        self.assertEqual(response['accepted'], u'pending')
+
+    @httpretty.activate
+    def test_senders(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/senders/'),
+            body='["NEWS", "awesome"]',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.senders()
+        self.assertEqual(response, [u'NEWS', u'awesome'])
+
 
 if __name__ == '__main__':
     unittest.main()
