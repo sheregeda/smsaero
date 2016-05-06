@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: UTF-8
 import json
 import time
@@ -10,26 +11,6 @@ from datetime import datetime
 
 class SmsAeroError(Exception):
     """ Super class of all SmsAero Errors. """
-    pass
-
-
-class DateValueError(SmsAeroError):
-    """ Exception raised when value date incorrectly. """
-    pass
-
-
-class UnexpectedMessageFormat(SmsAeroError):
-    """ incorrect language in '...' use the cyrillic or roman alphabet. """
-    pass
-
-
-class UnexpectedResponse(SmsAeroError):
-    """ Exception raised when unexpected format is received. """
-    pass
-
-
-class InvalidUse(SmsAeroError):
-    """ Exception raised when API method is not used correctly. """
     pass
 
 
@@ -54,19 +35,31 @@ class SmsAero(object):
             'from': self.sign,
         })
         url = urljoin(self.url_gate, selector)
-        return self._check_response(self.session.post(url, data=data).content)
+
+        try:
+            response = self.session.post(url, data=data)
+        except requests.RequestException as err:
+            raise SmsAeroError(err)
+
+        if not response.status_code == 200:
+            raise SmsAeroError('response status code is not 200')
+
+        return self._check_response(response.content)
 
     def _check_response(self, content):
         try:
             response = json.loads(content)
             if response['result'] == u'reject':
-                raise InvalidUse(response['reason'])
+                raise SmsAeroError(response['reason'])
+            elif response['result'] == u'no credits':
+                raise SmsAeroError(response['result'])
             return response
         except ValueError:
             if 'incorrect language' in content:
-                raise UnexpectedMessageFormat(content)
+                raise SmsAeroError("incorrect language in '...' use \
+                    the cyrillic or roman alphabet.")
             else:
-                raise UnexpectedResponse()
+                raise SmsAeroError('unexpected format is received')
 
     def send(self, to, text, date=None, digital=0, type_send=2, answer='json'):
         data = {
@@ -81,6 +74,6 @@ class SmsAero(object):
             if isinstance(date, datetime):
                 data.update({'date': int(time.mktime(date.timetuple()))})
             else:
-                raise DateValueError('param `date` is not datetime object')
+                raise SmsAeroError('param `date` is not datetime object')
 
         return self._request('/send/', data)

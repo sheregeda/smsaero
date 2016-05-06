@@ -1,12 +1,10 @@
 # coding: utf-8
 import unittest
 import httpretty
+import requests
 from urlparse import urljoin
 from datetime import datetime, timedelta
-from smsaero.api import SmsAero
-from smsaero.api import (
-    DateValueError, UnexpectedMessageFormat, UnexpectedResponse, InvalidUse
-)
+from smsaero.api import SmsAero, SmsAeroError
 
 
 class TestApi(unittest.TestCase):
@@ -15,23 +13,63 @@ class TestApi(unittest.TestCase):
 
     def test__check_response(self):
         try:
-            self.api._check_response(
-                "incorrect language in '' use the cyrillic or roman alphabet")
+            self.api._check_response("incorrect language in '' use the \
+                cyrillic or roman alphabet")
             self.assertTrue(False)
-        except UnexpectedMessageFormat:
+        except SmsAeroError:
             pass
 
         try:
             self.api._check_response('some text')
             self.assertTrue(False)
-        except UnexpectedResponse:
+        except SmsAeroError:
             pass
 
         try:
-            self.api._check_response(
-                '{"reason": "empty field", "result": "reject"}')
+            self.api._check_response('{"reason": "empty field", \
+                "result": "reject"}')
             self.assertTrue(False)
-        except InvalidUse:
+        except SmsAeroError:
+            pass
+
+        try:
+            self.api._check_response('{"id": 33166386, "result": "accepted"}')
+        except SmsAeroError:
+            self.assertTrue(False)
+
+    @httpretty.activate
+    def test__request(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/send/'),
+            body='{}',
+            status=500,
+        )
+
+        try:
+            response = self.api.send(
+                '8911111111',
+                'message',
+            )
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
+        def exceptionCallback(request, uri, headers):
+            raise requests.Timeout('Connection timed out.')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/send/'),
+            body=exceptionCallback,
+            status=200,
+            content_type='text/json',
+        )
+
+        try:
+            response = self.api.send('89111111111', 'message')
+            self.assertTrue(False)
+        except SmsAeroError:
             pass
 
     @httpretty.activate
@@ -58,11 +96,28 @@ class TestApi(unittest.TestCase):
             response = self.api.send(
                 '8911111111',
                 'message',
-                date='datetime.now() + timedelta(1)',
+                date='date value',
             )
             self.assertTrue(False)
-        except DateValueError:
+        except SmsAeroError:
             pass
+
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/send/'),
+            body='{"result": "no credits"}',
+            status=200,
+        )
+
+        try:
+            response = self.api.send(
+                '8911111111',
+                'message',
+            )
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
 
 if __name__ == '__main__':
     unittest.main()
