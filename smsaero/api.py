@@ -14,6 +14,11 @@ class SmsAeroError(Exception):
     pass
 
 
+class SmsAeroHTTPError(SmsAeroError):
+    """ A Connection error occurred. """
+    pass
+
+
 class SmsAero(object):
     URL_GATE = 'http://gate.smsaero.ru/'
     SIGNATURE = 'NEWS'
@@ -39,10 +44,10 @@ class SmsAero(object):
         try:
             response = self.session.post(url, data=data)
         except requests.RequestException as err:
-            raise SmsAeroError(err)
+            raise SmsAeroHTTPError(err)
 
         if not response.status_code == 200:
-            raise SmsAeroError('response status code is not 200')
+            raise SmsAeroHTTPError('response status code is not 200')
 
         return self._check_response(response.content)
 
@@ -72,14 +77,34 @@ class SmsAero(object):
 
         if date is not None:
             if isinstance(date, datetime):
-                data.update({'date': int(time.mktime(date.timetuple()))})
+                data['date'] = int(time.mktime(date.timetuple()))
             else:
                 raise SmsAeroError('param `date` is not datetime object')
 
         return self._request('/send/', data)
 
+    def sendtogroup(self, group, text, date=None, digital=0, type_send=2):
+        data = {
+            'from': self.signature,
+            'digital': digital,
+            'type_send': type_send,
+            'group': group,
+            'text': text,
+        }
+
+        if date is not None:
+            if isinstance(date, datetime):
+                data['date'] = int(time.mktime(date.timetuple()))
+            else:
+                raise SmsAeroError('param `date` is not datetime object')
+
+        return self._request('/sendtogroup/', data)
+
     def status(self, id):
         return self._request('/status/', {'id': id})
+
+    def checksending(self, id):
+        return self._request('/checksending/', {'id': id})
 
     def balance(self):
         return self._request('/balance/', {})
@@ -101,3 +126,18 @@ class SmsAero(object):
 
     def delgroup(self, group):
         return self._request('/delgroup/', {'group': group})
+
+    def addphone(self, phone, group=None):
+        data = {'phone': phone} if group is None \
+            else {'phone': phone, 'group': group}
+
+        return self._request('/addphone/', data)
+
+    def delphone(self, phone, group=None):
+        data = {'phone': phone} if group is None \
+            else {'phone': phone, 'group': group}
+
+        return self._request('/delphone/', data)
+
+    def addblacklist(self, phone):
+        return self._request('/addblacklist/', {'phone': phone})

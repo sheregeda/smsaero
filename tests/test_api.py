@@ -4,7 +4,7 @@ import httpretty
 import requests
 from urlparse import urljoin
 from datetime import datetime, timedelta
-from smsaero.api import SmsAero, SmsAeroError
+from smsaero.api import SmsAero, SmsAeroError, SmsAeroHTTPError
 
 
 class TestApi(unittest.TestCase):
@@ -47,12 +47,9 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            response = self.api.send(
-                '8911111111',
-                'message',
-            )
+            self.api.send('89111111111', 'message')
             self.assertTrue(False)
-        except SmsAeroError:
+        except SmsAeroHTTPError:
             pass
 
         def exceptionCallback(request, uri, headers):
@@ -67,9 +64,9 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            response = self.api.send('89111111111', 'message')
+            self.api.send('89111111111', 'message')
             self.assertTrue(False)
-        except SmsAeroError:
+        except SmsAeroHTTPError:
             pass
 
     @httpretty.activate
@@ -93,11 +90,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(response['result'], u'accepted')
 
         try:
-            response = self.api.send(
-                '8911111111',
-                'message',
-                date='date value',
-            )
+            self.api.send('89111111111', 'message', date='date value')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -110,10 +103,48 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            response = self.api.send(
-                '8911111111',
-                'message',
-            )
+            self.api.send('89111111111', 'message')
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
+    @httpretty.activate
+    def test_sendtogroup(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/sendtogroup/'),
+            body='{"id": 321, "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.sendtogroup('test', 'message')
+        self.assertEqual(response['result'], u'accepted')
+
+        response = self.api.sendtogroup(
+            'test',
+            'message',
+            date=datetime.now() + timedelta(2),
+        )
+        self.assertEqual(response['result'], u'accepted')
+
+        try:
+            self.api.sendtogroup('test', 'message', date='date value')
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/sendtogroup/'),
+            body='{"reason": "Forbidden group name", \
+                "result": "reject"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        try:
+            self.api.sendtogroup('test2', 'message')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -130,6 +161,34 @@ class TestApi(unittest.TestCase):
 
         try:
             self.api.status(0)
+            self.assertTrue(False)
+        except SmsAeroError:
+            pass
+
+    @httpretty.activate
+    def test_checksending(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/checksending/'),
+            body='{"reason": {"33460579": "smsc reject", \
+                "33460580": "delivery success"}, \
+                "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        self.api.checksending(322)
+
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/checksending/'),
+            body='{"reason": "empty field", "result": "reject"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        try:
+            self.api.checksending('')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -227,6 +286,60 @@ class TestApi(unittest.TestCase):
         response = self.api.delgroup('test')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Group delete')
+
+    @httpretty.activate
+    def test_addphone(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/addphone/'),
+            body='{"reason": "Number added to test group", \
+                "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.addphone('89111111111', 'test')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Number added to test group')
+
+        response = self.api.addphone('89111111112')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Number added to test group')
+
+    @httpretty.activate
+    def test_delphone(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/delphone/'),
+            body='{"reason": "Phone delete in test group", \
+                "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.delphone('89111111111', 'test')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Phone delete in test group')
+
+        response = self.api.delphone('89111111112')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Phone delete in test group')
+
+    @httpretty.activate
+    def test_addblacklist(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/addblacklist/'),
+            body='{"reason": "Phone added to your blacklist", \
+                "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.addblacklist('89111111111')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Phone added to your blacklist')
+
 
 if __name__ == '__main__':
     unittest.main()
