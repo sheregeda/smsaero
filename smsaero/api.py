@@ -92,3 +92,12 @@ class SmsAero(object):
 
     def sign(self, sign):
         return self._request('/sign/', {'sign': sign})
+
+    def checkgroup(self):
+        return self._request('/checkgroup/', {})
+
+    def addgroup(self, group):
+        return self._request('/addgroup/', {'group': group})
+
+    def delgroup(self, group):
+        return self._request('/delgroup/', {'group': group})

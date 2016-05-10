@@ -187,6 +187,46 @@ class TestApi(unittest.TestCase):
         response = self.api.senders()
         self.assertEqual(response, [u'NEWS', u'awesome'])
 
+    @httpretty.activate
+    def test_checkgroup(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/checkgroup/'),
+            body='{"reason": ["Личные контакты"], "result": "accepted "}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.checkgroup()
+        self.assertEqual(response['reason'], [u'Личные контакты'])
+
+    @httpretty.activate
+    def test_addgroup(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/addgroup/'),
+            body='{"reason": "Group created", "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.addgroup('test')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Group created')
+
+    @httpretty.activate
+    def test_delgroup(self):
+        httpretty.register_uri(
+            httpretty.POST,
+            urljoin(SmsAero.URL_GATE, '/delgroup/'),
+            body='{"reason": "Group delete", "result": "accepted"}',
+            status=200,
+            content_type='text/json',
+        )
+
+        response = self.api.delgroup('test')
+        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['reason'], u'Group delete')
 
 if __name__ == '__main__':
     unittest.main()
