@@ -2,10 +2,10 @@ language: python
 python:
     - "2.7"
 install:
+    - pip install -r requirements.txt
     - pip install pytest-cov
     - pip install pytest-pep8
     - pip install coveralls
-    - pip install httpretty
 script: py.test ./tests/test_api.py --pep8 smsaero -v --cov smsaero --cov-report term-missing
 after_success:
     - coveralls

@@ -4,12 +4,12 @@ import httpretty
 import requests
 from urlparse import urljoin
 from datetime import datetime, timedelta
-from smsaero.api import SmsAero, SmsAeroError, SmsAeroHTTPError
+from smsaero import SmsAero, SmsAeroError, SmsAeroHTTPError
 
 
 class TestApi(unittest.TestCase):
     def setUp(self):
-        self.api = SmsAero('test', 'test')
+        self.api = SmsAero(u'test', u'test')
 
     def test__check_response(self):
         try:
@@ -47,7 +47,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send('89111111111', 'message')
+            self.api.send(u'89111111111', u'message')
             self.assertTrue(False)
         except SmsAeroHTTPError:
             pass
@@ -64,7 +64,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send('89111111111', 'message')
+            self.api.send(u'89111111111', u'message')
             self.assertTrue(False)
         except SmsAeroHTTPError:
             pass
@@ -79,18 +79,18 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.send('89111111111', 'message')
+        response = self.api.send(u'89111111111', u'message')
         self.assertEqual(response['result'], u'accepted')
 
         response = self.api.send(
-            '89111111111',
-            'message',
+            u'89111111111',
+            u'message',
             date=datetime.now() + timedelta(1),
         )
         self.assertEqual(response['result'], u'accepted')
 
         try:
-            self.api.send('89111111111', 'message', date='date value')
+            self.api.send(u'89111111111', u'message', date='date value')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -103,7 +103,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send('89111111111', 'message')
+            self.api.send(u'89111111111', u'сообщение')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -118,7 +118,7 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.sendtogroup('test', 'message')
+        response = self.api.sendtogroup(u'test', u'message')
         self.assertEqual(response['result'], u'accepted')
 
         response = self.api.sendtogroup(
@@ -144,7 +144,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.sendtogroup('test2', 'message')
+            self.api.sendtogroup(u'test2', u'message')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -298,11 +298,11 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.addphone('89111111111', 'test')
+        response = self.api.addphone(u'89111111111', u'test')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Number added to test group')
 
-        response = self.api.addphone('89111111112')
+        response = self.api.addphone(u'89111111112')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Number added to test group')
 
@@ -317,11 +317,11 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.delphone('89111111111', 'test')
+        response = self.api.delphone(u'89111111111', u'test')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Phone delete in test group')
 
-        response = self.api.delphone('89111111112')
+        response = self.api.delphone(u'89111111112')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Phone delete in test group')
 
@@ -336,7 +336,7 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.addblacklist('89111111111')
+        response = self.api.addblacklist(u'89111111111')
         self.assertEqual(response['result'], u'accepted')
         self.assertEqual(response['reason'], u'Phone added to your blacklist')
 
