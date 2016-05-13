@@ -14,7 +14,8 @@ In [1]: from smsaero import SmsAero
 In [2]: api = SmsAero(u'login', u'password')
 
 # Расширенное создание объекта
-In [3]: api = SmsAero(u'login', u'password', url_gate=u'http://gate.smsaero.ru/', signature=u'SOME', digital=1, type_send=4)
+In [3]: api = SmsAero(u'login', u'password', url_gate=u'http://gate.smsaero.ru/',
+                      signature=u'SOME', digital=1, type_send=4)
 
 # Отправка сообщений
 In [4]: api.send(u'8123456789', u'text message')
@@ -38,7 +39,9 @@ Out [8]: {u'id': 33475057, u'result': u'delivery success'}
 
 # Статусы сообщений для рассылки по группе
 In [9]: api.checksending(321)
-Out [9]: {u'reason': {u'33460579': u'smsc reject',  u'33460580': u'delivery success'}, u'result': u'accepted'}
+Out [9]:
+{u'reason': {u'33460579': u'smsc reject', u'33460580': u'delivery success'},
+ u'result': u'accepted'}
 
 # Запрос баланса
 In [10]: api.balance()
@@ -46,7 +49,10 @@ Out [10]: {u'balance': u'48.20'}
 
 # Запрос тарифа
 In [11]: api.checktarif()
-Out [11]: {u'reason': {u'Digital channel': u'0.45', u'Direct channel': u'1.80'}, u'result': u'accepted'}
+Out [11]:
+{u'reason': {u'Digital channel': u'0.45', u'Direct channel': u'1.80'},
+ u'result': u'accepted'}
+
 
 # Список доступных подписей
 In [12]: api.senders()
