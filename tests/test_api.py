@@ -9,7 +9,7 @@ from smsaero import SmsAero, SmsAeroError, SmsAeroHTTPError
 
 class TestApi(unittest.TestCase):
     def setUp(self):
-        self.api = SmsAero(u'test', u'test')
+        self.api = SmsAero('test', 'test')
 
     def test__check_response(self):
         try:
@@ -47,7 +47,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send(u'89111111111', u'message')
+            self.api.send('89111111111', 'message')
             self.assertTrue(False)
         except SmsAeroHTTPError:
             pass
@@ -64,7 +64,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send(u'89111111111', u'message')
+            self.api.send('89111111111', 'message')
             self.assertTrue(False)
         except SmsAeroHTTPError:
             pass
@@ -79,18 +79,18 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.send(u'89111111111', u'message')
-        self.assertEqual(response['result'], u'accepted')
+        response = self.api.send('89111111111', 'message')
+        self.assertEqual(response['result'], 'accepted')
 
         response = self.api.send(
-            u'89111111111',
-            u'message',
+            '89111111111',
+            'message',
             date=datetime.now() + timedelta(1),
         )
-        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['result'], 'accepted')
 
         try:
-            self.api.send(u'89111111111', u'message', date='date value')
+            self.api.send('89111111111', 'message', date='date value')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -103,7 +103,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.send(u'89111111111', u'сообщение')
+            self.api.send('89111111111', 'сообщение')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -118,15 +118,15 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.sendtogroup(u'test', u'message')
-        self.assertEqual(response['result'], u'accepted')
+        response = self.api.sendtogroup('test', 'message')
+        self.assertEqual(response['result'], 'accepted')
 
         response = self.api.sendtogroup(
             'test',
             'message',
             date=datetime.now() + timedelta(2),
         )
-        self.assertEqual(response['result'], u'accepted')
+        self.assertEqual(response['result'], 'accepted')
 
         try:
             self.api.sendtogroup('test', 'message', date='date value')
@@ -144,7 +144,7 @@ class TestApi(unittest.TestCase):
         )
 
         try:
-            self.api.sendtogroup(u'test2', u'message')
+            self.api.sendtogroup('test2', 'message')
             self.assertTrue(False)
         except SmsAeroError:
             pass
@@ -204,7 +204,7 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.balance()
-        self.assertEqual(response['balance'], u'48.20')
+        self.assertEqual(response['balance'], '48.20')
 
     @httpretty.activate
     def test_checktarif(self):
@@ -218,7 +218,7 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.checktarif()
-        self.assertEqual(response['reason']['Digital channel'], u'0.45')
+        self.assertEqual(response['reason']['Digital channel'], '0.45')
 
     @httpretty.activate
     def test_sign(self):
@@ -231,7 +231,7 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.sign('awesome')
-        self.assertEqual(response['accepted'], u'pending')
+        self.assertEqual(response['accepted'], 'pending')
 
     @httpretty.activate
     def test_senders(self):
@@ -244,7 +244,7 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.senders()
-        self.assertEqual(response, [u'NEWS', u'awesome'])
+        self.assertEqual(response, ['NEWS', 'awesome'])
 
     @httpretty.activate
     def test_checkgroup(self):
@@ -257,7 +257,7 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.checkgroup()
-        self.assertEqual(response['reason'], [u'Личные контакты'])
+        self.assertEqual(response['reason'], ['Личные контакты'])
 
     @httpretty.activate
     def test_addgroup(self):
@@ -270,8 +270,8 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.addgroup('test')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Group created')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Group created')
 
     @httpretty.activate
     def test_delgroup(self):
@@ -284,8 +284,8 @@ class TestApi(unittest.TestCase):
         )
 
         response = self.api.delgroup('test')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Group delete')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Group delete')
 
     @httpretty.activate
     def test_addphone(self):
@@ -298,13 +298,13 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.addphone(u'89111111111', u'test')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Number added to test group')
+        response = self.api.addphone('89111111111', 'test')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Number added to test group')
 
-        response = self.api.addphone(u'89111111112')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Number added to test group')
+        response = self.api.addphone('89111111112')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Number added to test group')
 
     @httpretty.activate
     def test_delphone(self):
@@ -317,13 +317,13 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.delphone(u'89111111111', u'test')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Phone delete in test group')
+        response = self.api.delphone('89111111111', 'test')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Phone delete in test group')
 
-        response = self.api.delphone(u'89111111112')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Phone delete in test group')
+        response = self.api.delphone('89111111112')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Phone delete in test group')
 
     @httpretty.activate
     def test_addblacklist(self):
@@ -336,9 +336,9 @@ class TestApi(unittest.TestCase):
             content_type='text/json',
         )
 
-        response = self.api.addblacklist(u'89111111111')
-        self.assertEqual(response['result'], u'accepted')
-        self.assertEqual(response['reason'], u'Phone added to your blacklist')
+        response = self.api.addblacklist('89111111111')
+        self.assertEqual(response['result'], 'accepted')
+        self.assertEqual(response['reason'], 'Phone added to your blacklist')
 
 
 if __name__ == '__main__':

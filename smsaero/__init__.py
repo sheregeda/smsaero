@@ -5,8 +5,12 @@ import time
 import requests
 import hashlib
 import json
-from urlparse import urljoin
 from datetime import datetime
+
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
 
 
 class SmsAeroError(Exception):
@@ -34,8 +38,7 @@ class SmsAero(object):
         self.type_send = type_send
         self.session = requests.session()
 
-        m = hashlib.md5()
-        m.update(passwd)
+        m = hashlib.md5(passwd.encode())
         self.passwd = m.hexdigest()
 
     def _request(self, selector, data):
@@ -54,7 +57,7 @@ class SmsAero(object):
         if not response.status_code == 200:
             raise SmsAeroHTTPError('response status code is not 200')
 
-        return self._check_response(response.content)
+        return self._check_response(response.text)
 
     def _check_response(self, content):
         try:

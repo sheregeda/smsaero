@@ -85,6 +85,11 @@ Out[18]: {u'reason': u'Phone delete in test group', u'result': u'accepted'}
 In [19]: api.addblacklist(u'8123456789')
 Out[19]: {u'reason': u'Phone added to your blacklist', u'result': u'accepted'}
 ```
+## Python 2
+Для использования библиотеки с Python 2 установите версию пакета 1.0.3:
+```
+pip install smsaero==1.0.3
+```
 ## Исключения
 Библиотека может выбросить исключения:
 * SmsAeroError(Exception)
