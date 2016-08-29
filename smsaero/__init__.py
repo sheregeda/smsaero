@@ -6,11 +6,7 @@ import requests
 import hashlib
 import json
 from datetime import datetime
-
-try:
-    from urllib.parse import urljoin
-except ImportError:
-    from urlparse import urljoin
+from urllib.parse import urljoin
 
 
 class SmsAeroError(Exception):

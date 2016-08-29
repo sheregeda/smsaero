@@ -2,7 +2,7 @@
 import unittest
 import httpretty
 import requests
-from urlparse import urljoin
+from urllib.parse import urljoin
 from datetime import datetime, timedelta
 from smsaero import SmsAero, SmsAeroError, SmsAeroHTTPError
 
@@ -251,13 +251,13 @@ class TestApi(unittest.TestCase):
         httpretty.register_uri(
             httpretty.POST,
             urljoin(SmsAero.URL_GATE, '/checkgroup/'),
-            body='{"reason": ["Личные контакты"], "result": "accepted "}',
+            body='{"reason": ["test"], "result": "accepted "}',
             status=200,
             content_type='text/json',
         )
 
         response = self.api.checkgroup()
-        self.assertEqual(response['reason'], ['Личные контакты'])
+        self.assertEqual(response['reason'], ['test'])
 
     @httpretty.activate
     def test_addgroup(self):
