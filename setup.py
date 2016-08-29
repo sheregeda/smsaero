@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'smsaero',
-    version = '1.0.3',
+    version = '1.1.0',
     description = u'send SMS via smsaero.ru',
     author = 'Nikolay Sheregeda',
     author_email = 'ns.sheregeda@gmail.com',
